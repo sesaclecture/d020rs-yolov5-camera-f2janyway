@@ -8,29 +8,49 @@ model = torch.hub.load("ultralytics/yolov5", "yolov5m")
 cap = cv2.VideoCapture(0)
 
 # TODO: Loop for camera frames
+while True:
+
+    # Read frame (BGR to RGB)
+    ret, frame = cap.read()
+    # TODO: break the loop on error
+
+    # 추론 실행 (BGR -> RGB)
+    rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = model(rgb_frame)
+
+    # TODO: Boudning box 그리기
+    for i, obj in enumerate(results.xyxy[0]):
+        # TODO: 인식결과를 표시하기 위한 좌표를 얻음
+        # obj: tensor([ 14.81506,   5.24789, 596.73694, 471.00906,   0.60714,   0.00000])
+# obj.data: tensor([ 14.81506,   5.24789, 596.73694, 471.00906,   0.60714,   0.00000])
+# obj.real: tensor([ 14.81506,   5.24789, 596.73694, 471.00906,   0.60714,   0.00000])
+# Object 0: person
+        x,y,w,h,e,f = [int(i) for i in obj.data]
+
+        # TODO: 인식된 정확도(confidence)와 클래스를 label로 구성
 
 
-# Read frame (BGR to RGB)
-ret, frame = cap.read()
-# TODO: break the loop on error
+        # TODO: OpenCV를 이용해서 해당 좌표에 사각형과 text를 출력
+        print(f"obj: {obj}")
+        print(f"obj.data: {obj.data}")
+        print(f"obj.real: {obj.real}")
+        obj_info = list(map(int, obj))
+        print(f"Object {i}: {model.names[obj_info[5]]}")
+        cv2.rectangle(frame,pt1=(x,y),pt2=(x+w,y+h),color=(0,255,0),thickness=2)
+        cv2.putText(frame,model.names[obj_info[5]],(x,y-10),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
 
-# 추론 실행 (BGR -> RGB)
-rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-results = model(rgb_frame)
+    cv2.imshow("ddd",frame)
+    # TODO: 화면 표시
+    # cv2.rectangle(rgb_frame)
+    # x,y,w,h = cv2.boundingRect(contour)
+    # cv2.rectangle(image,(x,y),(x+w,y+h),(0,255,0),2)
+    # cv2.putText(image,f"rect ({x},{y},{w},{h})",(x,y-10),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
 
-# TODO: Boudning box 그리기
-for i, obj in enumerate(results.xyxy[0]):
-    # TODO: 인식결과를 표시하기 위한 좌표를 얻음
 
-    # TODO: 인식된 정확도(confidence)와 클래스를 label로 구성
-
-    # TODO: OpenCV를 이용해서 해당 좌표에 사각형과 text를 출력
-    obj_info = list(map(int, obj))
-    print(f"Object {i}: {model.names[obj_info[5]]}")
-
-# TODO: 화면 표시
-
-# TODO: 종료를 위한 key 처리
+    # TODO: 종료를 위한 key 처리
+    key = cv2.waitKey(1) & 0xff
+    if key == 27:
+        break
 
 cap.release()
 cv2.destroyAllWindows()
