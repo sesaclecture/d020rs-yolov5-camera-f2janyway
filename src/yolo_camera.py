@@ -29,6 +29,8 @@ while True:
 
         # TODO: 인식된 정확도(confidence)와 클래스를 label로 구성
 
+        pred = results.pred[0][i]
+        print("pred",pred)
 
         # TODO: OpenCV를 이용해서 해당 좌표에 사각형과 text를 출력
         print(f"obj: {obj}")
@@ -36,8 +38,9 @@ while True:
         print(f"obj.real: {obj.real}")
         obj_info = list(map(int, obj))
         print(f"Object {i}: {model.names[obj_info[5]]}")
-        cv2.rectangle(frame,pt1=(x,y),pt2=(x+w,y+h),color=(0,255,0),thickness=2)
-        cv2.putText(frame,model.names[obj_info[5]],(x,y-10),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
+        cv2.rectangle(frame,pt1=(x,y),pt2=(w,h),color=(0,255,0),thickness=2)
+        text = f"{model.names[obj_info[5]]}:{obj[4]:.2f}"
+        cv2.putText(frame,text,(x,y-10),cv2.FONT_HERSHEY_PLAIN,1,(0,255,0),1)
 
     cv2.imshow("ddd",frame)
     # TODO: 화면 표시
